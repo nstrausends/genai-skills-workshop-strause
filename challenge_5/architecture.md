@@ -47,15 +47,3 @@ flowchart TB
 5. **Model Armor (output template)** validates the response for sensitive-data
    leakage and malicious URLs; violating output is replaced.
 6. **Log** the response and return it to the resident.
-
-## How each Challenge 5 requirement is met
-
-| Requirement | Where |
-|---|---|
-| Backend data store for RAG | RAG Engine corpus, ingested from staged GCS data — `scripts/01_stage_data.sh` + `scripts/02_create_rag_corpus.py`, tool in `ads_agent/agent.py` |
-| Access to backend API functionality | `ads_agent/tools.py` (api.weather.gov forecasts + alerts) |
-| Unit tests for agent functionality | `tests/` (tools, safety, callbacks) |
-| Evaluation via Google Evaluation service | `eval/run_eval.py` + `eval/eval_dataset.json` |
-| Prompt filtering & response validation | Model Armor in `ads_agent/safety.py` + `ads_agent/callbacks.py`; input + output templates in `scripts/03_create_model_armor.py` |
-| Log all prompts and responses | `ads_agent/observability.py` → Cloud Logging, called from callbacks |
-| Agent deployed to a website | Agent Engine (`scripts/04_deploy_agent_engine.py`) + Streamlit (`frontend/app.py`) |
