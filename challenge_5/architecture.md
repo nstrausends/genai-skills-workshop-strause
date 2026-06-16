@@ -1,0 +1,61 @@
+# Architecture — Alaska Department of Snow Online Agent
+
+```mermaid
+flowchart TB
+    user([Resident]) -->|question| web["Streamlit website<br/>(frontend/app.py)"]
+    web -->|stream_query| ae
+
+    subgraph AE["Vertex AI Agent Engine (managed runtime)"]
+        ae["ADK agent: ads_agent"]
+        bm{{"before_model callback"}}
+        gem["Gemini (gemini-flash-latest)"]
+        am{{"after_model callback"}}
+
+        ae --> bm
+        bm -->|"log prompt + Model Armor screen"| gem
+        gem -->|tool calls| tools
+        gem --> am
+        am -->|"Model Armor validate + log response"| ae
+
+        subgraph tools["Tools"]
+            rag["retrieve_ads_docs<br/>(rag.retrieval_query)"]
+            wx["get_weather_forecast / get_weather_alerts"]
+        end
+    end
+
+    rag --> corpus[("RAG Engine corpus<br/>backend data store")]
+    wx --> nws["api.weather.gov<br/>(backend API)"]
+    bm -. screen .-> armorin["Model Armor INPUT<br/>jailbreak / PI"]
+    am -. validate .-> armorout["Model Armor OUTPUT<br/>sensitive data / URLs"]
+    bm --> logs[["Cloud Logging<br/>ads-agent-interactions"]]
+    am --> logs
+
+    gcs[("gs://labs.roitraining.com/<br/>alaska-dept-of-snow")] -.->|"01_stage_data.sh + 02_create_rag_corpus.py"| corpus
+
+    ae --> eval["GenAI Evaluation Service<br/>(eval/run_eval.py)"]
+```
+
+## Secure request/response flow
+
+1. Resident asks a question on the website.
+2. **Log** the prompt to Cloud Logging.
+3. **Model Armor (input template)** screens the prompt for prompt-injection /
+   jailbreak / harmful content. On a match, the model call is skipped and a safe
+   message is returned.
+4. Gemini answers, **grounded** in the RAG corpus (`retrieve_ads_docs`) and live
+   National Weather Service data (`get_weather_*`).
+5. **Model Armor (output template)** validates the response for sensitive-data
+   leakage and malicious URLs; violating output is replaced.
+6. **Log** the response and return it to the resident.
+
+## How each Challenge 5 requirement is met
+
+| Requirement | Where |
+|---|---|
+| Backend data store for RAG | RAG Engine corpus, ingested from staged GCS data — `scripts/01_stage_data.sh` + `scripts/02_create_rag_corpus.py`, tool in `ads_agent/agent.py` |
+| Access to backend API functionality | `ads_agent/tools.py` (api.weather.gov forecasts + alerts) |
+| Unit tests for agent functionality | `tests/` (tools, safety, callbacks) |
+| Evaluation via Google Evaluation service | `eval/run_eval.py` + `eval/eval_dataset.json` |
+| Prompt filtering & response validation | Model Armor in `ads_agent/safety.py` + `ads_agent/callbacks.py`; input + output templates in `scripts/03_create_model_armor.py` |
+| Log all prompts and responses | `ads_agent/observability.py` → Cloud Logging, called from callbacks |
+| Agent deployed to a website | Agent Engine (`scripts/04_deploy_agent_engine.py`) + Streamlit (`frontend/app.py`) |

@@ -1,0 +1,27 @@
+[project]
+name = "ads-online-agent"
+version = "0.1.0"
+description = "Alaska Department of Snow online agent (ADK + Agent Engine) - Challenge 5"
+requires-python = ">=3.11,<3.14"
+dependencies = [
+    "google-adk>=1.0.0",
+    "google-cloud-aiplatform[adk,agent_engines,evaluation]>=1.95.0",
+    "google-cloud-logging>=3.10.0",
+    "google-cloud-modelarmor>=0.2.0",
+    "requests>=2.31.0",
+    "python-dotenv>=1.0.0",
+]
+
+[project.optional-dependencies]
+frontend = ["streamlit>=1.36.0"]
+dev = ["pytest>=8.0.0"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["ads_agent*"]
