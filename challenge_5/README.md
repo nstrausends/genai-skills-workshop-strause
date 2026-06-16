@@ -18,7 +18,7 @@ See [`architecture.md`](architecture.md) for the diagram and request/response fl
 | ✅ Evaluation via the Google Evaluation service API | `eval/run_eval.py` + `eval/eval_dataset.json` — Vertex AI GenAI Evaluation Service, in code |
 | ✅ Prompt filtering & response validation | Model Armor in `ads_agent/safety.py`, wired through `ads_agent/callbacks.py`; two templates (input: jailbreak/PI; output: sensitive-data/SDP + malicious URLs) created by `scripts/03_create_model_armor.py` |
 | ✅ Log all prompts and responses | `ads_agent/observability.py` → Cloud Logging, called from the callbacks |
-| ✅ Agent deployed to a website | Agent Engine (`scripts/03_deploy_agent_engine.py`) + Streamlit chat UI (`frontend/app.py`) |
+| ✅ Agent deployed to a website | Agent Engine (`scripts/04_deploy_agent_engine.py`) + Streamlit chat UI (`frontend/app.py`) |
 
 ## Prerequisites
 
@@ -46,7 +46,7 @@ bash scripts/01_stage_data.sh
 # 3. Build the RAG corpus from the staged data          -> paste ADS_RAG_CORPUS into .env
 uv run python scripts/02_create_rag_corpus.py
 
-# 4. Create the Model Armor guardrail template          -> paste ADS_MODEL_ARMOR_TEMPLATE into .env
+# 4. Create the Model Armor templates  -> paste ADS_MODEL_ARMOR_INPUT_TEMPLATE + _OUTPUT_TEMPLATE into .env
 uv run python scripts/03_create_model_armor.py
 
 # 5. Deploy the agent to Agent Engine                   -> paste ADS_AGENT_ENGINE_RESOURCE into .env

@@ -8,7 +8,7 @@ flowchart TB
     subgraph AE["Vertex AI Agent Engine (managed runtime)"]
         ae["ADK agent: ads_agent"]
         bm{{"before_model callback"}}
-        gem["Gemini (gemini-flash-latest)"]
+        gem["Gemini (gemini-2.5-flash)"]
         am{{"after_model callback"}}
 
         ae --> bm
@@ -30,9 +30,8 @@ flowchart TB
     bm --> logs[["Cloud Logging<br/>ads-agent-interactions"]]
     am --> logs
 
-    gcs[("gs://labs.roitraining.com/<br/>alaska-dept-of-snow")] -.->|"01_stage_data.sh + 02_create_rag_corpus.py"| corpus
-
-    ae --> eval["GenAI Evaluation Service<br/>(eval/run_eval.py)"]
+    gcs[("workshop bucket<br/>gs://labs.roitraining.com")] -.->|"01_stage_data.sh"| databkt[("project bucket<br/>gs://PROJECT-ads-data")]
+    databkt -.->|"02_create_rag_corpus.py (ingest)"| corpus
 ```
 
 ## Secure request/response flow

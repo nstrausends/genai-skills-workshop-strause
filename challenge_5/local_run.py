@@ -5,8 +5,8 @@ before deploying. Uses ADK's in-memory runner.
 
 Requires Google Cloud auth (`gcloud auth application-default login`) and, in .env:
 GOOGLE_CLOUD_PROJECT, GOOGLE_CLOUD_LOCATION. Set ADS_RAG_CORPUS to test RAG
-grounding and ADS_MODEL_ARMOR_TEMPLATE to test prompt/response filtering
-(both are optional locally — the agent still runs without them).
+grounding and ADS_MODEL_ARMOR_INPUT_TEMPLATE / ADS_MODEL_ARMOR_OUTPUT_TEMPLATE to
+test prompt/response filtering (all optional locally — the agent still runs without them).
 
 Usage:
     uv run python local_run.py                       # interactive chat

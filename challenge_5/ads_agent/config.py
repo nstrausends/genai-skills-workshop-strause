@@ -19,7 +19,7 @@ os.environ.setdefault("GOOGLE_GENAI_USE_VERTEXAI", "True")
 # resolve on Vertex AI in every project/region.
 MODEL = os.environ.get("ADS_MODEL", "gemini-2.5-flash")
 
-# Full resource name of the RAG corpus, produced by scripts/01_create_rag_corpus.py
+# Full resource name of the RAG corpus, produced by scripts/02_create_rag_corpus.py
 # e.g. projects/<num>/locations/us-central1/ragCorpora/<id>
 RAG_CORPUS = os.environ.get("ADS_RAG_CORPUS", "")
 
